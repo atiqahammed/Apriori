@@ -157,42 +157,76 @@ void operate(vector<productSet> setOfProductList, vector<transaction> transactio
 	operate(newSetofProductList, transactions);
 }
 
+bool subsetOf(productSet subset, productSet testList) {
+	int count = 0;
+	for(int i = 0; i < subset.productList.size(); i++) 
+		for(int j = 0; j < testList.productList.size(); j++) 
+			if(subset.productList[i] == testList.productList[j]) {
+				count++;
+				break;
+			}
+	if(count ==  subset.productList.size()) return true;
+	return false;
+		
+}
 
+void printConfidence(productSet testList) {
+	cout << endl;
+
+	for(int i = 0; i < allProductSetWithMinSup.size(); i++) {
+		if(allProductSetWithMinSup[i].productList.size() < testList.productList.size()) {
+
+			if(subsetOf(allProductSetWithMinSup[i], testList)) {
+
+				for(int k = 0; k <allProductSetWithMinSup[i].productList.size(); k++) {
+					cout << allProductSetWithMinSup[i].productList[k] << " ";
+				}
+				cout << endl;
+
+
+				for(int k = 0; k < testList.productList.size(); k++) {
+					cout << testList.productList[k] << " ";
+				}
+
+				cout << "       confidence  =  " << testList.count << "/" << allProductSetWithMinSup[i].count << "  =  " << ((double)testList.count/allProductSetWithMinSup[i].count)*100 << "%" << endl;
+
+				cout << endl;
+
+
+			}
+		}
+	}
+}
 
 int main(void) {
 
 	vector<transaction> transactions;
 	vector<string> uniqueProduct;
-	//map<productSet, int> countOfProductSet;
-
-
-	
+	vector<productSet> setofProductList;
 
 	inputTransactions(transactions);
 	findUniqueProduct(uniqueProduct, transactions);
-
-	vector<productSet> setofProductList;
-
 	makeSetOfProductList(setofProductList, uniqueProduct);
 	operate(setofProductList, transactions);
 
+	int maximumProductList = allProductSetWithMinSup[allProductSetWithMinSup.size() - 1].productList.size();
+	
+	for(int i = allProductSetWithMinSup.size() - 1; i > 0; i--) {
+		if(allProductSetWithMinSup[i].productList.size() < maximumProductList)
+			break;
+		printConfidence(allProductSetWithMinSup[i]);
+	}
 
 
-	//cout << setofProductList[0].productList[0] << endl;
+	/*for(int i = allProductSetWithMinSup.size() - 1; i > 0; i++) {
+		if(allProductSetWithMinSup[i].productList.size() == maximumProductList)
+			break;
 
-	//countOfProductSet[setofProductList[0]] = 9;
-
-	//cout << countOfProductSet[setofProductList[0]] << endl;
-
+		printConfidence(allProductSetWithMinSup[i]);
+	}*/
 
 
-
-	//cout << setofProductList.size() << endl;
-
-	//cout << uniqueProduct.size() << endl;
-
-	//cout << transactions.size() << endl;
-	//cout << "completed" << endl;
+	//cout << maximumProductList << endl;
 
 
 
