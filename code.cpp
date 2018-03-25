@@ -126,6 +126,30 @@ productSet getNewCombination(productSet set1, productSet set2) {
 	return newSet;
 }
 
+
+
+bool suffexExist(vector<productSet> selectedSetOfProductList, productSet tempCombination) {
+	for(int i = 0; i < selectedSetOfProductList.size(); i++) {
+		int count = 0;
+		for(int j = 0; j < selectedSetOfProductList[i].productList.size(); j++) {
+			for(int k = 1; k < tempCombination.productList.size(); k++) {
+				if(tempCombination.productList[k] == selectedSetOfProductList[i].productList[j])
+					count++;
+			}
+		}
+		
+		if(count == selectedSetOfProductList[i].productList.size()) {
+			//cout << count << endl;
+			return true;
+			
+		}
+			
+	}
+	
+	
+	return false;
+}
+
 void operate(vector<productSet> setOfProductList, vector<transaction> transactions) {
 	vector<productSet> selectedSetOfProductList;
 	selectProductList(setOfProductList, transactions, selectedSetOfProductList);
@@ -150,8 +174,13 @@ void operate(vector<productSet> setOfProductList, vector<transaction> transactio
 	} else 
 		for(int i = 0; i < selectedSetOfProductList.size() - 1; i++)
 			for(int j = i + 1; j < selectedSetOfProductList.size(); j++)
-				if(selectedSetOfProductList[i].productList[0] == selectedSetOfProductList[j].productList[0])
-					newSetofProductList.push_back( getNewCombination(selectedSetOfProductList[i], selectedSetOfProductList[j]));
+				if(selectedSetOfProductList[i].productList[0] == selectedSetOfProductList[j].productList[0]) {
+					
+					productSet tempCombination = getNewCombination(selectedSetOfProductList[i], selectedSetOfProductList[j]);
+					if(suffexExist(selectedSetOfProductList, tempCombination))
+						newSetofProductList.push_back( tempCombination);
+				}
+					
 
 	depth++;
 	operate(newSetofProductList, transactions);
@@ -200,6 +229,7 @@ void printConfidence(productSet testList) {
 
 int main(void) {
 
+	freopen("input.txt", "r", stdin);
 	vector<transaction> transactions;
 	vector<string> uniqueProduct;
 	vector<productSet> setofProductList;
@@ -209,26 +239,14 @@ int main(void) {
 	makeSetOfProductList(setofProductList, uniqueProduct);
 	operate(setofProductList, transactions);
 
+
 	int maximumProductList = allProductSetWithMinSup[allProductSetWithMinSup.size() - 1].productList.size();
 	
 	for(int i = allProductSetWithMinSup.size() - 1; i > 0; i--) {
-		if(allProductSetWithMinSup[i].productList.size() < maximumProductList)
+		if(allProductSetWithMinSup[i].productList.size() ==  1)
 			break;
 		printConfidence(allProductSetWithMinSup[i]);
 	}
-
-
-	/*for(int i = allProductSetWithMinSup.size() - 1; i > 0; i++) {
-		if(allProductSetWithMinSup[i].productList.size() == maximumProductList)
-			break;
-
-		printConfidence(allProductSetWithMinSup[i]);
-	}*/
-
-
-	//cout << maximumProductList << endl;
-
-
 
 	return 0;
 }
